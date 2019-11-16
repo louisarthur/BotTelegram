@@ -24,6 +24,7 @@ public class BotController extends TelegramLongPollingBot{
     private LocationController locationControl = new LocationController();
     private AssetController assetControl = new AssetController();
     private CategoryController categoryControl = new CategoryController();
+    private Asset bufferAsset;
 
     public void onUpdateReceived(Update update) {
         String commandReceived = update.getMessage().getText();
@@ -98,7 +99,18 @@ public class BotController extends TelegramLongPollingBot{
                             "]", "").replace(" ", ""));
                 }
             }
-            else if (commandReceived.equals("/listproductsbylocation")){}
+            else if (commandReceived.equals("/listproductsbylocation"))
+            {
+                if(locationControl.getLocals().size() == 0)
+                    message.setText("Não foi adicionada nenhuma localização!");
+                else if(assetControl.getAssets().size() == 0)
+                    message.setText("Não foi adicionado nenhum produto!");
+                else
+                {
+                    message.setText("Ok. Me fale o nome da localização que você quer usar para a listagem.");
+                    state = BotStates.LISTING_ASSET_BY_LOCATION;
+                }
+            }
             else if (commandReceived.equals("/searchbycode")) {
                 System.out.println("Here, we will search by code");
                 message.setText("Digite o código:\n");
@@ -117,6 +129,16 @@ public class BotController extends TelegramLongPollingBot{
             }
             else if (commandReceived.equals("/moveproduct")) {
                 System.out.println("Move the product");
+                System.out.println("Move the product");
+                if(assetControl.getAssets().size() == 0)
+                    message.setText("Não há bens cadastrados!");
+                else if(locationControl.getLocals().size() == 0)
+                    message.setText("Não há locais cadastrados!");
+                else
+                {
+                    message.setText("Certo. Diga o nome do bem que você mover.");
+                    state = BotStates.MOVING_WAITING_ASSETNAME;
+                }
             }
             else if (commandReceived.equals("/report")) {
                 System.out.println("Make the report");
@@ -271,6 +293,58 @@ public class BotController extends TelegramLongPollingBot{
             state = BotStates.IDLE;
         }
 //      ***********************  LOCATION PROCEDURES ***********************
+
+//      ***********************   OTHER  PROCEDURES  ***********************
+        else if(state == BotStates.LISTING_ASSET_BY_LOCATION)
+        {
+            message.setText(assetControl.listByLocation(commandReceived));
+            state = BotStates.IDLE;
+        }
+        else if(state == BotStates.MOVING_WAITING_ASSETNAME)
+        {
+            if(assetControl.searchByName(commandReceived) == null)
+            {
+                message.setText("Não há nenhum bem com o nome providenciado!");
+                state = BotStates.IDLE;
+            }
+            else if(assetControl.searchByName(commandReceived).size() > 1)
+            {
+                message.setText("Existem vários bens com o nome " + commandReceived + ". No momento, não é possível fazer a busca.");
+                state = BotStates.IDLE;
+            }
+            else
+            {
+                bufferAsset = assetControl.searchByName(commandReceived).get(0);
+                message.setText("Achei um bem com o nome providenciado." +
+                        "\nCódigo: " + bufferAsset.getCode() +
+                        "\nDescrição: " + bufferAsset.getDescription() +
+                        "\nLocal atual: " + bufferAsset.getMyLocation().getName() +
+                        " Agora, diga o nome do novo local.");
+                state = BotStates.MOVING_WAITING_LOCATIONNAME;
+            }
+        }
+        else if(state == BotStates.MOVING_WAITING_LOCATIONNAME)
+        {
+            bufferLocation = null;
+            for(int i = 0; i < locationControl.getLocals().size(); i++)
+            {
+                bufferLocation = locationControl.getLocals().get(i);
+                if(bufferLocation.getName().equals(commandReceived))
+                    break;
+                bufferLocation = null;
+            }
+            if(bufferLocation == null)
+            {
+                message.setText("Local não encontrado!");
+                state = BotStates.IDLE;
+            }
+            else
+            {
+                bufferAsset.setMyLocation(bufferLocation);
+                message.setText("Localização encontrada. Efetuando troca.");
+                state = BotStates.IDLE;
+            }
+        }
 
 
         message.setChatId(update.getMessage().getChatId());

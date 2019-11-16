@@ -64,4 +64,21 @@ public class AssetController {
         }
     }
 
+    public String listByLocation(String compare)
+    {
+
+        String toReturn = "Ok, esses são os bens na localização " + compare + ":\n";
+        for (int i = 0; i < assets.size(); i++)
+        {
+            if(assets.get(i).getMyLocation().getName().equals(compare))
+            {
+                toReturn += assets.get(i).getName() + ";\n";
+            }
+        }
+        if(toReturn.equals("Ok, esses são os bens na localização " + compare + ":\n"))
+            return "Não foi encontrado nenhum bem que esteja na localização que você enviou!";
+
+        return toReturn;
+    }
+
 }
