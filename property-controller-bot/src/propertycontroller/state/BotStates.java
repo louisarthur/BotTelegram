@@ -1,5 +1,13 @@
 package propertycontroller.state;
-
+/**
+ * Esse enum foi necessário para fazer a criação da máquina de estados,
+ * a maquina de estados vai fazer o nosso projeto funcionar em cima de
+ * somente um método principal.
+ *
+ * @author Louis Arthur Machado Bezerra do Nascimento
+ * @author Gabriel Paes Landim de Lucena
+ * @version 1.0 versão feita em 17 novembro de 2019
+ */
 public enum BotStates
 {
         IDLE,

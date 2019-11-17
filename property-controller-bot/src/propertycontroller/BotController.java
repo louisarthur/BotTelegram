@@ -3,18 +3,28 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
-import java.lang.reflect.Array;
-import java.util.*;
 import propertycontroller.controllers.AssetController;
 import propertycontroller.controllers.CategoryController;
 import propertycontroller.controllers.LocationController;
 import propertycontroller.models.*;
 import propertycontroller.state.BotStates;
 
-
+/**
+ * Essa classe é a BotController, é a classe principal do funcionamento do Bot
+ * essa classe faz toda a parte de autenticação através de tokens e o username
+ * do Bot, além de receber as mensagens do Telegram e redirecionar para os controllers.
+ *
+ * @author Louis Arthur Machado Bezerra do Nascimento - Github: louisarthur
+ * @author Gabriel Paes Landim de Lucena - Github: lucena-fr4ct1ons
+ *
+ * @version 1.0 versão feita em 17 novembro de 2019
+ */
 public class BotController extends TelegramLongPollingBot{
 
+    /**
+     * Variaveis de auxilio.
+     * @version 1.0 versão feita em 17 novembro de 2019
+     */
     private String bufferName;
     private String bufferDescription;
     private String bufferCode;
@@ -26,12 +36,31 @@ public class BotController extends TelegramLongPollingBot{
     private CategoryController categoryControl = new CategoryController();
     private Asset bufferAsset;
 
+    /**
+     * método criado para receber as mensagens, cada vez que uma mensagem é recebida
+     * esse método é acionado e faz o tratamento da mensagem, esse método internamento
+     * é regido por uma máquina de estados para fazer o tratamento das mensagens
+     * @version 1.0 versão feita em 17 novembro de 2019
+     *
+     * @param update é um parametro que contém várias features da mensagem enviada.
+     *
+     */
     public void onUpdateReceived(Update update) {
+        /**
+         * variavel de recebimento da mensagem em formato de texto
+         */
         String commandReceived = update.getMessage().getText();
         SendMessage message = new SendMessage();
 
 
 //      ***********************  MAIN PROCEDURES ***********************
+        /**
+         * Procedimentos iniciais que o bot poderá executar, pois o estado inicial do BOT é o IDLE
+         * posteriormente o comando será verificado através de vários IF tornando a complexidade dessa busca
+         * em seu pior caso O(n).
+         * Se o comando for encontrado o estado vai ser mudado para o estado da opção selecionada.
+         * @version 1.0 versão feita em 17 novembro de 2019
+         */
         if(state == BotStates.IDLE) {
             if (commandReceived.equals("/about")) {
                 System.out.println("Sending message about bot.");
@@ -99,8 +128,7 @@ public class BotController extends TelegramLongPollingBot{
                             "]", "").replace(" ", ""));
                 }
             }
-            else if (commandReceived.equals("/listproductsbylocation"))
-            {
+            else if (commandReceived.equals("/listproductsbylocation")) {
                 if(locationControl.getLocals().size() == 0)
                     message.setText("Não foi adicionada nenhuma localização!");
                 else if(assetControl.getAssets().size() == 0)
@@ -145,8 +173,6 @@ public class BotController extends TelegramLongPollingBot{
             }
         }
 //      ***********************  MAIN PROCEDURES ***********************
-
-
 //      ***********************  ASSET PROCEDURES ***********************
         else if(state == BotStates.WAITING_ASSET_NAME){
             bufferName = commandReceived;
@@ -248,8 +274,6 @@ public class BotController extends TelegramLongPollingBot{
             state = BotStates.IDLE;
         }
 //      ***********************  ASSET PROCEDURES ***********************
-
-
 //      ***********************  CATEGORY PROCEDURES ***********************
         else if(state == BotStates.WAITING_CATEGORY_NAME){
             bufferName = commandReceived;
@@ -274,7 +298,6 @@ public class BotController extends TelegramLongPollingBot{
             state = BotStates.IDLE;
         }
 //      ***********************  CATEGORY PROCEDURES ***********************
-
 //      ***********************  LOCATION PROCEDURES ***********************
         else if(state== BotStates.WAITING_LOCATION_NAME){
             bufferName = commandReceived;
@@ -293,15 +316,12 @@ public class BotController extends TelegramLongPollingBot{
             state = BotStates.IDLE;
         }
 //      ***********************  LOCATION PROCEDURES ***********************
-
 //      ***********************   OTHER  PROCEDURES  ***********************
-        else if(state == BotStates.LISTING_ASSET_BY_LOCATION)
-        {
+        else if(state == BotStates.LISTING_ASSET_BY_LOCATION) {
             message.setText(assetControl.listByLocation(commandReceived));
             state = BotStates.IDLE;
         }
-        else if(state == BotStates.MOVING_WAITING_ASSETNAME)
-        {
+        else if(state == BotStates.MOVING_WAITING_ASSETNAME) {
             if(assetControl.searchByName(commandReceived) == null)
             {
                 message.setText("Não há nenhum bem com o nome providenciado!");
@@ -323,8 +343,7 @@ public class BotController extends TelegramLongPollingBot{
                 state = BotStates.MOVING_WAITING_LOCATIONNAME;
             }
         }
-        else if(state == BotStates.MOVING_WAITING_LOCATIONNAME)
-        {
+        else if(state == BotStates.MOVING_WAITING_LOCATIONNAME) {
             bufferLocation = null;
             for(int i = 0; i < locationControl.getLocals().size(); i++)
             {
@@ -346,17 +365,30 @@ public class BotController extends TelegramLongPollingBot{
             }
         }
 
-
+        /**
+         *Esse trecho de código pegará o ID do usuário que enviou a mensagem para fazer
+         * o retorno direcionado ao usuário.
+         */
         message.setChatId(update.getMessage().getChatId());
+
         try {
             execute(message);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Esse método faz uma parte da autenticação do BOT
+     * @return o username do bot para a API
+     */
     public String getBotUsername() {
         return "patrimony_controller_bot";
     }
+    /**
+     * Esse método faz uma parte da autenticação do BOT
+     * @return o token do bot para a API
+     */
     public String getBotToken() {
         return "806147067:AAG9SSRMruwytYdBwkcxdpgrlQPzRVskbk0";
     }

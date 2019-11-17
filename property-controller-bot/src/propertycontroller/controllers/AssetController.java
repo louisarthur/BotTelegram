@@ -2,21 +2,43 @@ package propertycontroller.controllers;
 import propertycontroller.models.Asset;
 import propertycontroller.models.Category;
 import propertycontroller.models.Location;
-
 import java.util.ArrayList;
-
+/**
+ * Essa classe é a AssetController, essa classe faz a parte do controle do model Asset
+ * onde tem todos os métodos necessários para o funcionamento normal do programa.
+ *
+ * @author Louis Arthur Machado Bezerra do Nascimento - Github: louisarthur
+ * @author Gabriel Paes Landim de Lucena - Github: lucena-fr4ct1ons
+ *
+ * @version 1.0 versão feita em 17 novembro de 2019
+ */
 public class AssetController {
     private ArrayList<Asset> assets;
-
+    /**
+     * Metodo construtor para inicialização do array list;
+     */
     public AssetController() {
         assets = new ArrayList<>();
     }
+    /**
+     * Esse metodo consiste no armazenamento de um produto
+     * @param bufferName nome do produto a ser armazenado
+     * @param bufferDescription descrição do produto a ser armazenado
+     * @param bufferCode código do produto a ser armazendao
+     * @param bufferLocation localização do produto a ser armazenado
+     * @param bufferCategory categoria do produto a ser armazenado
+     * @return retorna um boolean informado o armazenamento
+     */
     public boolean store(String bufferName, String bufferDescription, String bufferCode, Location bufferLocation, Category bufferCategory){
         assets.add(new Asset(bufferName, bufferDescription, bufferCode, bufferLocation, bufferCategory));
         return true;
     }
+
+    /**
+     * Esse metodo consiste em retornar um array com todos os produtos armazenados.
+     * @return Retorna um array com todos os nomes (String) de produtos contidos no sistema.
+     */
     public ArrayList<String> index(){
-//       Necessário ajustar ainda o padrão de retornar multriplos tipos de váriavéis
         System.out.println("Existe: "+assets.size()+" itens adicionados nos produtos");
         if(assets.size()==0) {
             return null;
@@ -29,9 +51,19 @@ public class AssetController {
         }
         return assetsName;
     }
+
+    /**
+     * Esse metodo consiste em retornar um array com todos os produtos armazenados.
+     * @return Retorna um array com todos os objetos de produtos(assets) contidos no sistema.
+     */
     public ArrayList<Asset> getAssets(){
         return this.assets;
     }
+    /**
+     * Esse método é o de pesquisa pelo nome.
+     * @param name Recebe o nome do produto
+     * @return Retorna um array com todos os objetos de produtos(assets) contidos no sistema com o nome igual o do parametro recebido.
+     */
     public ArrayList<Asset> searchByName (String name){
         ArrayList<Asset> bufferArray = new ArrayList<>();
         for (Asset a : assets) {
@@ -47,6 +79,11 @@ public class AssetController {
             return bufferArray;
         }
     }
+    /**
+     * Esse método é o de pesquisa pelo código.
+     * @param code Recebe o código do produto
+     * @return Retorna um array com todos os objetos de produtos(assets) contidos no sistema com o código igual o do parametro recebido.
+     */
     public ArrayList<Asset> searchByCode (String code){
         ArrayList<Asset> bufferArray = new ArrayList<>();
         for (Asset a : assets) {
@@ -63,9 +100,12 @@ public class AssetController {
             return bufferArray;
         }
     }
-
-    public String listByLocation(String compare)
-    {
+    /**
+     * Esse método é o de listagem por localização
+     * @param compare recebe uma localização
+     * @return retorna em string todos os produtos por localização.
+     */
+    public String listByLocation(String compare){
 
         String toReturn = "Ok, esses são os bens na localização " + compare + ":\n";
         for (int i = 0; i < assets.size(); i++)
