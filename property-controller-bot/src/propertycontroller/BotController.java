@@ -140,8 +140,35 @@ public class BotController extends TelegramLongPollingBot{
                     state = BotStates.MOVING_WAITING_ASSETNAME;
                 }
             }
-            else if (commandReceived.equals("/report")) {
+            else if (commandReceived.equals("/report"))
+            {
                 System.out.println("Make the report");
+                if(assetControl.getAssets().size() == 0)
+                    message.setText("Não foi cadastrado nenhum bem!");
+                else if(locationControl.getLocals().size() == 0)
+                    message.setText("Não foi cadastrada nenhuma localização!");
+                else if(categoryControl.getCategories().size() == 0)
+                    message.setText("Não foi cadastrada nenhuma categoria!");
+                else
+                {
+                    String bufferMessage = "-- LOCALIZAÇÕES --\n";
+                    for (int i = 0; i < locationControl.getLocals().size(); i++) {
+                        bufferMessage += "Bens no local " + locationControl.getLocals().get(i).getName() + ":\n";
+                        for (int j = 0; j < assetControl.getAssets().size(); j++) {
+                            if (assetControl.getAssets().get(j).getMyLocation().getName().equals(locationControl.getLocals().get(i).getName()))
+                                bufferMessage += assetControl.getAssets().get(j).getName() + ";\n";
+                        }
+                    }
+                    bufferMessage += "-- CATEGORIAS --\n";
+                    for (int i = 0; i < categoryControl.getCategories().size(); i++) {
+                        bufferMessage += "Bens na categoria " + categoryControl.getCategories().get(i).getName() + ":\n";
+                        for (int j = 0; j < assetControl.getAssets().size(); j++) {
+                            if (assetControl.getAssets().get(j).getMyCategory().getName().equals(categoryControl.getCategories().get(i).getName()))
+                                bufferMessage += assetControl.getAssets().get(j).getName() + ";\n";
+                        }
+                    }
+                    message.setText(bufferMessage);
+                }
             }
         }
 //      ***********************  MAIN PROCEDURES ***********************
