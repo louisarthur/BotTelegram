@@ -167,6 +167,32 @@ public class BotController extends TelegramLongPollingBot{
                                 bufferMessage += assetControl.getAssets().get(j).getName() + ";\n";
                         }
                     }
+
+                    bufferMessage += "-- BENS --\n" + "Todos os bens ordenados alfabeticamente. \n";
+                    String buffer;
+                    String names[] = new String[assetControl.getAssets().size()];
+                    for (int i = 0; i < names.length; i++)
+                    {
+                        names[i] = assetControl.getAssets().get(i).getName();
+                    }
+
+                    for (int i = 0; i < names.length; i++)
+                    {
+                        for (int j = i + 1; j < names.length; j++)
+                        {
+                            if(names[j].compareTo(names[i]) < 0)
+                            {
+                                buffer = names[i];
+                                names[i] = names[j];
+                                names[j] = buffer;
+                            }
+                        }
+                    }
+
+                    for (int i = 0; i < names.length; i++)
+                    {
+                        bufferMessage += Integer.toString(i + 1) + " - " + names[i] + ";\n";
+                    }
                     message.setText(bufferMessage);
                 }
             }
