@@ -53,7 +53,6 @@ public class AssetController implements Controller {
         }
         return assetsName;
     }
-
     /**
      * Esse metodo consiste em retornar um array com todos os produtos armazenados.
      * @return Retorna um array com todos os objetos de produtos(assets) contidos no sistema.
