@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import propertycontroller.controllers.AssetController;
 import propertycontroller.controllers.CategoryController;
 import propertycontroller.controllers.LocationController;
+import propertycontroller.exceptions.InvalidOptionException;
 import propertycontroller.models.*;
 import propertycontroller.state.BotStates;
 
@@ -246,36 +247,52 @@ public class BotController extends TelegramLongPollingBot{
             message.setText("Certo! o código do bem a ser adicionado é: \n" +
                     bufferCode+"\n" +
                     "Muito bem, agora adicione o local que o produto estará\n" +
-                    "Só precisa adicionar o número");
+                    "Só precisa adicionar o número.\n");
             if(locationControl.index() == null){
-                message.setText("\nExiste um pequeno problema, ainda não foi adicionado nenhum local!\n" +
+                message.setText( message.getText() + "Existe um pequeno problema, ainda não foi adicionado nenhum local!\n" +
                         "portanto, irei reiniciar lhe redirecionando para o menu.\n");
                 state = BotStates.IDLE;
             }
             else{
-                message.setText(String.valueOf(locationControl.index()).replace(",",
+                message.setText( message.getText() + String.valueOf(locationControl.index()).replace(",",
                         "\n").replace("[", "").replace(
                         "]", "").replace(" ", ""));
                 state = BotStates.WAITING_ASSET_LOCATION;
             }
         }
         else if(state== BotStates.WAITING_ASSET_LOCATION){
-            int bufferTemporary = Integer.parseInt(commandReceived);
-//          tem que fazer o tratamento de erros.
-            bufferLocation = locationControl.getLocals().get(bufferTemporary - 1);
-            message.setText("Entendido! o local selecionado foi: " + bufferLocation.getName() + "\n" +
-                    "Agora, iremos selecionar a categoria do produto\n");
-            if(categoryControl.index() == null){
-                message.setText("\nExiste um pequeno problema, ainda não foi adicionado nenhuma categoria!\n" +
-                        "portanto, irei reiniciar lhe redirecionando para o menu.\n\n\n");
-                state = BotStates.IDLE;
+            int bufferTemporary = 0;
+            try
+            {
+                bufferTemporary = Integer.parseInt(commandReceived);
+                try
+                {
+                    bufferLocation = locationControl.getLocation(bufferTemporary);
+                    message.setText("Entendido! o local selecionado foi: " + bufferLocation.getName() + "\n" +
+                            "Agora, iremos selecionar a categoria do produto\n");
+                    if(categoryControl.index() == null){
+                        message.setText(message.getText() + "Existe um pequeno problema, ainda não foi adicionado nenhuma localização!\n" +
+                                "portanto, irei reiniciar lhe redirecionando para o menu.\n\n\n");
+                        state = BotStates.IDLE;
+                    }
+                    else{
+                        message.setText(message.getText() + String.valueOf(categoryControl.index()).replace(",",
+                                "\n").replace("[", "").replace(
+                                "]", "").replace(" ", ""));
+                        state = BotStates.WAITING_ASSET_CATEGORY;
+                    }
+                }catch (InvalidOptionException e)
+                {
+                    message.setText("Valor inválido! Por favor, insira um número da lista acima.");
+                }
+
             }
-            else{
-                message.setText(String.valueOf(categoryControl.index()).replace(",",
-                        "\n").replace("[", "").replace(
-                        "]", "").replace(" ", ""));
-                state = BotStates.WAITING_ASSET_CATEGORY;
+            catch(NumberFormatException e)
+            {
+                message.setText("Mensagen inválida! Por favor, insira somente um número.");
             }
+//          tem que fazer o tratamento de erros. FEITO
+
         }
         else if(state == BotStates.WAITING_ASSET_CATEGORY){
             if(categoryControl.index() == null) {
@@ -284,17 +301,33 @@ public class BotController extends TelegramLongPollingBot{
                 state = BotStates.IDLE;
             }
             else{
-                int bufferTemporary = Integer.parseInt(commandReceived);
-                bufferCategory = categoryControl.getCategories().get(bufferTemporary-1);
-                assetControl.store(bufferName,bufferDescription,bufferCode,bufferLocation,bufferCategory);
-                message.setText("Entendido!!! a categoria selecionada foi: "+bufferCategory.getName()+"\n" +
-                        "O item a seguir foi adicionado ao nosso banco de dados. \n" +
-                        "Nome: "+ assetControl.getAssets().get(0).getName()+"\n" +
-                        "Descrição: "+assetControl.getAssets().get(0).getDescription()+"\n" +
-                        "Código: "+ assetControl.getAssets().get(0).getCode()+"\n" +
-                        "Categoria: "+assetControl.getAssets().get(0).getMyCategory().getName()+"\n" +
-                        "Localização: "+ assetControl.getAssets().get(0).getMyLocation().getName()+"\n");
-                state = BotStates.IDLE;
+                int bufferTemporary = 0;
+                try
+                {
+                    bufferTemporary = Integer.parseInt(commandReceived);
+                    try
+                    {
+                        bufferCategory = categoryControl.getCategory(bufferTemporary);
+                        assetControl.store(bufferName, bufferDescription, bufferCode, bufferLocation, bufferCategory);
+                        message.setText("Entendido!!! a categoria selecionada foi: " + bufferCategory.getName() + "\n" +
+                                "O item a seguir foi adicionado ao nosso banco de dados. \n" +
+                                "Nome: " + assetControl.getAssets().get(assetControl.getAssets().size() - 1).getName() + "\n" +
+                                "Descrição: " + assetControl.getAssets().get(assetControl.getAssets().size() - 1).getDescription() + "\n" +
+                                "Código: " + assetControl.getAssets().get(assetControl.getAssets().size() - 1).getCode() + "\n" +
+                                "Categoria: " + assetControl.getAssets().get(assetControl.getAssets().size() - 1).getMyCategory().getName() + "\n" +
+                                "Localização: " + assetControl.getAssets().get(assetControl.getAssets().size() - 1).getMyLocation().getName() + "\n");
+                        state = BotStates.IDLE;
+                    } catch (InvalidOptionException e)
+                    {
+                        message.setText("Valor inválido! Por favor, insira apenas um número da lista acima.");
+                    }
+                }
+                catch(NumberFormatException e)
+                {
+                    message.setText("Valor inválido!");
+                    return;
+                }
+
             }
         }
 //      ***********************  ASSET SEARCH ***********************
@@ -345,9 +378,9 @@ public class BotController extends TelegramLongPollingBot{
             categoryControl.store(bufferName,bufferDescription, bufferCode);
             message.setText("Certo! o código para essa categoria é: \n"+ bufferCode +
                     "\n Pronto, criamos a categoria! \n" + "\n"+
-                    "Nome: " + categoryControl.getCategories().get(0).getName()+"\n"+
-                    "Descrição: " + categoryControl.getCategories().get(0).getDescription()+"\n"+
-                    "código: " + categoryControl.getCategories().get(0).getCode()+"\n");
+                    "Nome: " + categoryControl.getCategories().get(categoryControl.getCategories().size() - 1).getName()+"\n"+
+                    "Descrição: " + categoryControl.getCategories().get(categoryControl.getCategories().size() - 1).getDescription()+"\n"+
+                    "código: " + categoryControl.getCategories().get(categoryControl.getCategories().size() - 1).getCode()+"\n");
             state = BotStates.IDLE;
         }
 //      ***********************  CATEGORY PROCEDURES ***********************
@@ -364,8 +397,8 @@ public class BotController extends TelegramLongPollingBot{
             message.setText("Certo! a descrição desse local é :\n" +
                     bufferDescription+"\n"+
                     "\nPronto, criamos o local! \n"+"\n" +
-                    "Nome: "+ locationControl.getLocals().get(0).getName()+"\n" +
-                    "Descrição: "+ locationControl.getLocals().get(0).getDescription()+"\n");
+                    "Nome: "+ locationControl.getLocals().get(locationControl.getLocals().size() - 1).getName()+"\n" +
+                    "Descrição: "+ locationControl.getLocals().get(locationControl.getLocals().size() - 1).getDescription()+"\n");
             state = BotStates.IDLE;
         }
 //      ***********************  LOCATION PROCEDURES ***********************

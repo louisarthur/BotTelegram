@@ -1,5 +1,7 @@
 package propertycontroller.controllers;
+import propertycontroller.exceptions.InvalidOptionException;
 import propertycontroller.interfaces.Controller;
+import propertycontroller.models.Asset;
 import propertycontroller.models.Category;
 import java.util.ArrayList;
 /**
@@ -56,4 +58,15 @@ public class CategoryController implements Controller {
         return this.categories;
     }
 
+    public Category getCategory(int index) throws InvalidOptionException
+    {
+        if(index < 1 || index > categories.size())
+        {
+            throw new InvalidOptionException();
+        }
+        else
+        {
+            return categories.get(index - 1);
+        }
+    }
 }

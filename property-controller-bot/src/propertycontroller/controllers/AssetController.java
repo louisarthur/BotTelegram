@@ -1,4 +1,5 @@
 package propertycontroller.controllers;
+import propertycontroller.exceptions.InvalidOptionException;
 import propertycontroller.interfaces.Controller;
 import propertycontroller.models.Asset;
 import propertycontroller.models.Category;
@@ -121,6 +122,18 @@ public class AssetController implements Controller {
             return "Não foi encontrado nenhum bem que esteja na localização que você enviou!";
 
         return toReturn;
+    }
+
+    public Asset getAsset(int index) throws InvalidOptionException
+    {
+        if(index < 1 || index >assets.size())
+        {
+            throw new InvalidOptionException();
+        }
+        else
+        {
+            return assets.get(index - 1);
+        }
     }
 
 }
