@@ -8,8 +8,7 @@ package propertycontroller.state;
  * @author Gabriel Paes Landim de Lucena
  * @version 1.0 versão feita em 17 novembro de 2019
  */
-public enum BotStates
-{
+public enum BotStates {
         IDLE,
         WAITING_ASSET_NAME, WAITING_ASSET_DESCRIPTION, WAITING_ASSET_CODE, WAITING_ASSET_CATEGORY, WAITING_ASSET_LOCATION,
         WAITING_LOCATION_NAME, WAITING_LOCATION_DESCRIPTION,
