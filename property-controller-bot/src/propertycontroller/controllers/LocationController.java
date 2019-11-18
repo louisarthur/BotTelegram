@@ -1,4 +1,5 @@
 package propertycontroller.controllers;
+import propertycontroller.interfaces.Controller;
 import propertycontroller.models.Location;
 import java.util.ArrayList;
 /**
@@ -10,7 +11,7 @@ import java.util.ArrayList;
  *
  * @version 1.0 versão feita em 17 novembro de 2019
  */
-public class LocationController {
+public class LocationController implements Controller {
     private ArrayList<Location> locals;
     /**
      * Metodo construtor para inicialização do array list;
@@ -24,7 +25,7 @@ public class LocationController {
      * @param bufferDescription descrição do local a ser armazenado
      * @return retorna um boolean informado o estado do armazenamento
      */
-    public boolean store(String bufferName,String bufferDescription){
+    public boolean store(String bufferName, String bufferDescription){
         locals.add(new Location(bufferName, bufferDescription));
         System.out.println("Existe: "+locals.size()+" itens adicionados nos locais");
         return true;
@@ -33,6 +34,7 @@ public class LocationController {
      * Esse metodo consiste em retornar um array com todos os locais armazenados.
      * @return Retorna um array com todos os nomes (String) dos locais contidas no sistema.
      */
+    @Override
     public ArrayList<String> index(){
         System.out.println("Existe: "+locals.size()+" itens adicionados nos locais");
         if(locals.size()==0){

@@ -1,4 +1,5 @@
 package propertycontroller.controllers;
+import propertycontroller.interfaces.Controller;
 import propertycontroller.models.Category;
 import java.util.ArrayList;
 /**
@@ -10,7 +11,7 @@ import java.util.ArrayList;
  *
  * @version 1.0 versão feita em 17 novembro de 2019
  */
-public class CategoryController {
+public class CategoryController implements Controller {
     private ArrayList<Category> categories;
     /**
      * Metodo construtor para inicialização do array list;
@@ -33,6 +34,7 @@ public class CategoryController {
      * Esse metodo consiste em retornar um array com todos as categorias armazenadas.
      * @return Retorna um array com todos os nomes (String) das categorias contidas no sistema.
      */
+    @Override
     public ArrayList<String> index(){
         System.out.println("Existe: "+categories.size()+" itens adicionados nas categorias");
         if(categories.size()==0){

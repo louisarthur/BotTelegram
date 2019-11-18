@@ -1,4 +1,5 @@
 package propertycontroller.controllers;
+import propertycontroller.interfaces.Controller;
 import propertycontroller.models.Asset;
 import propertycontroller.models.Category;
 import propertycontroller.models.Location;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
  *
  * @version 1.0 versão feita em 17 novembro de 2019
  */
-public class AssetController {
+public class AssetController implements Controller {
     private ArrayList<Asset> assets;
     /**
      * Metodo construtor para inicialização do array list;
@@ -38,6 +39,7 @@ public class AssetController {
      * Esse metodo consiste em retornar um array com todos os produtos armazenados.
      * @return Retorna um array com todos os nomes (String) de produtos contidos no sistema.
      */
+    @Override
     public ArrayList<String> index(){
         System.out.println("Existe: "+assets.size()+" itens adicionados nos produtos");
         if(assets.size()==0) {
