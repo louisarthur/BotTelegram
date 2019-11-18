@@ -1,4 +1,5 @@
 package propertycontroller.controllers;
+import propertycontroller.exceptions.InvalidOptionException;
 import propertycontroller.interfaces.Controller;
 import propertycontroller.models.Location;
 import java.util.ArrayList;
@@ -54,5 +55,17 @@ public class LocationController implements Controller {
      */
     public ArrayList<Location> getLocals(){
         return this.locals;
+    }
+
+    public Location getLocation(int index) throws InvalidOptionException
+    {
+        if(index < 1 || index > locals.size())
+        {
+            throw new InvalidOptionException();
+        }
+        else
+        {
+            return locals.get(index - 1);
+        }
     }
 }
